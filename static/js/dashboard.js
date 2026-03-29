@@ -21,10 +21,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+let currentDashTab = 'pending';
+
+function createDashboardList(issuesArray, isGov) {
+    if (issuesArray.length === 0) {
+        return '<p style="color: var(--text-secondary); font-style: italic; margin-bottom: 20px;">No issues found in this category.</p>';
+    }
+    
+    let html = `<div style="display: grid; gap: 15px;">`;
+    issuesArray.forEach(i => {
+        html += `
+            <div class="glass-panel" style="padding: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${i.title}</strong>
+                        <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 5px;">📍 ${i.location} | Urgency: ${i.urgency}/3</p>
+                    </div>
+        `;
+        
+        if (isGov) {
+            html += `
+                    <select class="form-input" style="width: 150px; padding: 8px;" onchange="updateStatus(${i.id}, this.value)">
+                        <option value="pending" ${i.status==='pending'?'selected':''}>Pending</option>
+                        <option value="in_progress" ${i.status==='in_progress'?'selected':''}>In Progress</option>
+                        <option value="done" ${i.status==='done'?'selected':''}>Done</option>
+                    </select>
+            `;
+        } else {
+             html += `<span style="border: 1px solid var(--border-glass); padding: 5px; border-radius: 8px; color: var(--warning);">${i.status.toUpperCase()}</span>`;
+        }
+        html += `</div></div>`;
+    });
+    html += `</div>`;
+    return html;
+}
+
+function updateDashTabsUI(issues, isGov) {
+    document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+        if(btn.dataset.target === currentDashTab) {
+            btn.style.background = 'var(--brand-primary)';
+            btn.style.boxShadow = '0 0 10px var(--brand-glow)';
+        } else {
+            btn.style.background = 'var(--bg-glass)';
+            btn.style.boxShadow = 'none';
+        }
+    });
+
+    const content = document.getElementById('dash-tab-content');
+    const filtered = issues.filter(i => i.status === currentDashTab);
+    content.innerHTML = createDashboardList(filtered, isGov);
+}
+
 async function renderCitizenDashboard(container) {
     container.innerHTML = `
         <div style="margin-bottom: 40px; padding: 20px; border: 1px solid var(--border-glass); border-radius: 12px;">
-            <h3 style="margin-bottom: 15px;">Report New Public Issue</h3>
+            <h3 style="margin-bottom: 15px; color: var(--brand-primary);">Report New Public Issue</h3>
             <form id="issue-form" style="display: grid; gap: 15px;">
                 <input class="form-input" id="i-title" placeholder="Issue Title" required>
                 <textarea class="form-input" id="i-desc" placeholder="Issue Description" required></textarea>
@@ -45,8 +96,13 @@ async function renderCitizenDashboard(container) {
                 <button type="submit" class="btn-primary">Submit Report</button>
             </form>
         </div>
-        <h3>My Reported Issues</h3>
-        <div id="my-issues-list" style="margin-top: 20px; display: grid; gap: 15px;"></div>
+        <h3 style="margin-bottom: 20px;">My Reported Issues</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-primary dash-tab-btn" data-target="pending" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">🚨 Pending</button>
+            <button class="btn-primary dash-tab-btn" data-target="in_progress" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">🚧 In Progress</button>
+            <button class="btn-primary dash-tab-btn" data-target="done" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">✅ Done</button>
+        </div>
+        <div id="dash-tab-content">Loading...</div>
     `;
 
     document.getElementById('issue-form').addEventListener('submit', async (e) => {
@@ -60,59 +116,51 @@ async function renderCitizenDashboard(container) {
         };
         await ApiClient.post('/issues/', data);
         alert("Issue successfully submitted!");
-        location.reload();
+        renderCitizenDashboard(container);
     });
 
-    const list = document.getElementById('my-issues-list');
     const res = await ApiClient.get('/issues/');
     const issues = await res.json();
-    // In a real app we would have an endpoint filtering by author natively
     const myIssues = issues.results || issues;
-    
-    if(myIssues.length === 0) {
-        list.innerHTML = '<p style="color: var(--text-secondary)">No issues generated yet.</p>';
-    }
 
-    myIssues.forEach(i => {
-        const d = document.createElement('div');
-        d.className = 'glass-panel';
-        d.style.padding = '15px';
-        d.innerHTML = `<strong>${i.title}</strong> - Status: <span style="color: var(--warning)">${i.status.toUpperCase()}</span>`;
-        list.appendChild(d);
+    document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            currentDashTab = e.target.dataset.target;
+            updateDashTabsUI(myIssues, false);
+        });
     });
+
+    updateDashTabsUI(myIssues, false);
 }
 
 async function renderGovDashboard(container) {
     container.innerHTML = `
-        <h3>Government Management Console</h3>
-        <p style="color: var(--success); margin-bottom: 20px;">Authenticated as Gov Employee. You have universal override clearance.</p>
-        <div id="unified-issues-list" style="display: grid; gap: 15px;"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
+            <h3>Government Management Console</h3>
+            <span style="background: var(--bg-glass); color: var(--success); padding: 5px 10px; border-radius: 6px; font-size: 0.8em;">Override Clearance Active</span>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-primary dash-tab-btn" data-target="pending" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">🚨 Pending</button>
+            <button class="btn-primary dash-tab-btn" data-target="in_progress" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">🚧 In Progress</button>
+            <button class="btn-primary dash-tab-btn" data-target="done" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">✅ Resolved</button>
+        </div>
+        
+        <div id="dash-tab-content">Loading...</div>
     `;
 
-    const list = document.getElementById('unified-issues-list');
     const res = await ApiClient.get('/issues/');
     const issues = await res.json();
     const all = issues.results || issues;
 
-    all.forEach(i => {
-        const d = document.createElement('div');
-        d.className = 'glass-panel';
-        d.style.padding = '15px';
-        d.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong>${i.title}</strong>
-                    <p style="font-size: 0.85em; color: var(--text-secondary);">${i.location} | Urgency: ${i.urgency}</p>
-                </div>
-                <select class="form-input" style="width: 150px;" onchange="updateStatus(${i.id}, this.value)">
-                    <option value="pending" ${i.status==='pending'?'selected':''}>Pending</option>
-                    <option value="in_progress" ${i.status==='in_progress'?'selected':''}>In Progress</option>
-                    <option value="done" ${i.status==='done'?'selected':''}>Done</option>
-                </select>
-            </div>
-        `;
-        list.appendChild(d);
+    document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            currentDashTab = e.target.dataset.target;
+            updateDashTabsUI(all, true);
+        });
     });
+
+    updateDashTabsUI(all, true);
 }
 
 async function updateStatus(issueId, newStatus) {
@@ -121,7 +169,8 @@ async function updateStatus(issueId, newStatus) {
             method: 'PATCH',
             body: JSON.stringify({ status: newStatus })
         });
-        alert("Status updated universally!");
+        const container = document.getElementById('dashboard-content');
+        await renderGovDashboard(container);
     } catch(e) {
         alert("Failed to update priority levels.");
     }
