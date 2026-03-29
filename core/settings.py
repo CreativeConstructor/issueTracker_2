@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'accounts.apps.AccountsConfig',
+    'issues.apps.IssuesConfig',
 ]
 
 MIDDLEWARE = [
@@ -160,3 +161,7 @@ SIMPLE_JWT = {
 
 # CORS configuration
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Media files setup for image uploads
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
