@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; margin-top: 50px;">
+    <div class="glass-panel" style="padding: 40px; width: 100%; max-width: 400px;">
+        <h2 style="margin-bottom: 20px; text-align: center;">Community Access</h2>
+        
+        <form id="login-form">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Username</label>
+                <input type="text" id="username" class="form-input" required>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Password</label>
+                <input type="password" id="password" class="form-input" required>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Authenticate securely</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

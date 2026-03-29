@@ -23,8 +23,17 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from core.views import index_view, login_view, dashboard_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Core Application Routes
+    path('', index_view, name='index'),
+    path('login/', login_view, name='login'),
+    path('dashboard/', dashboard_view, name='dashboard'),
+    
+    # API Routes
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include('issues.urls')),
