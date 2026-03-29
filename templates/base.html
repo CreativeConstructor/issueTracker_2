@@ -29,9 +29,9 @@
         </main>
     </div>
     
-    <!-- Token validation logic -> We will implement this via specific pages in the next commit -->
-    <script>
-        // Store common UI interactions here
-    </script>
+    <!-- Core JS Integration -->
+    <script src="{% static 'js/api.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+    {% block scripts %}{% endblock scripts %}
 </body>
 </html>

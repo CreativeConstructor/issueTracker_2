@@ -9,6 +9,10 @@
 </div>
 
 <div id="issue-list" style="margin-top: 30px; display: grid; gap: 20px;">
-    <!-- Issues will be dynamically loaded via JS in the next commit -->
+    <!-- Issues will be dynamically loaded via JS -->
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/feed.js' %}"></script>
+{% endblock scripts %}
