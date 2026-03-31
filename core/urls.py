@@ -33,6 +33,9 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('dashboard/', dashboard_view, name='dashboard'),
     
+    # Accounts Routes
+    path('', include('accounts.urls')),
+    
     # API Routes
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
