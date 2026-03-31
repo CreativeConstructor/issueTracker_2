@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: issue-tracker-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: issue-tracker
+  template:
+    metadata:
+      labels:
+        app: issue-tracker
+    spec:
+      containers:
+      - name: issue-tracker
+        image: issue-tracker:latest # Replace with your registry image
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: issue-tracker-db-secret
+        env:
+        - name: DEBUG
+          value: "0"
