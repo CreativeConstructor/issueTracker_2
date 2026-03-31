@@ -26,8 +26,20 @@ function createIssueCard(issue) {
                 <div style="font-size: 24px; color: ${upvoteColor};">⬆</div>
                 <strong style="color: ${upvoteColor};">${issue.upvote_count}</strong>
             </div>
+        <div class="comments-section" id="comments-section-${issue.id}">
+            <div class="comment-list" id="comment-list-${issue.id}">
+                <p style="font-size: 0.8em; color: var(--text-secondary);">Loading comments...</p>
+            </div>
+            <div class="comment-form">
+                <input type="text" id="comment-input-${issue.id}" class="comment-input" placeholder="Add a comment...">
+                <button class="comment-submit" onclick="postComment(${issue.id})">Post</button>
+            </div>
         </div>
     `;
+    
+    // Asynchronously load comments for this issue
+    loadComments(issue.id);
+    
     return card;
 }
 
@@ -96,5 +108,57 @@ async function toggleUpvote(issueId) {
         return window.location.href = '/login/';
     }
     await ApiClient.post(`/issues/${issueId}/upvote/`, {});
-    renderIssues(); 
+}
+
+async function loadComments(issueId) {
+    try {
+        const response = await ApiClient.get(`/issues/${issueId}/comments/`);
+        const comments = await response.json();
+        const list = document.getElementById(`comment-list-${issueId}`);
+        if (!list) return;
+        
+        list.innerHTML = '';
+        if (comments.length === 0) {
+            list.innerHTML = '<p style="font-size: 0.8em; color: var(--text-secondary);">No comments yet. Be the first!</p>';
+            return;
+        }
+        
+        comments.forEach(c => {
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `
+                <div class="comment-author">${c.user ? c.user.username : 'Anonymous'}</div>
+                <div class="comment-text">${c.text}</div>
+            `;
+            list.appendChild(item);
+        });
+    } catch(err) {
+        console.error('Failed to load comments:', err);
+    }
+}
+
+window.postComment = async function(issueId) {
+    if (!localStorage.getItem('access_token')) {
+        alert("Please login to comment!");
+        return window.location.href = '/login/';
+    }
+    
+    const input = document.getElementById(`comment-input-${issueId}`);
+    if (!input || !input.value.trim()) return;
+    
+    try {
+        const response = await ApiClient.post('/comments/', {
+            issue: issueId,
+            text: input.value.trim()
+        });
+        
+        if (response.ok) {
+            input.value = '';
+            loadComments(issueId);
+        } else {
+            alert("Failed to post comment.");
+        }
+    } catch(err) {
+        console.error(err);
+    }
 }
