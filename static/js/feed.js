@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-let currentFeedTab = 'pending';
+let currentFeedTab = 'all';
+let cachedIssues = [];
 
 function createIssueCard(issue) {
     const upvoteColor = issue.has_upvoted ? 'var(--brand-primary)' : 'var(--text-secondary)';
@@ -55,11 +56,11 @@ function updateTabsUI(issues) {
     });
 
     const content = document.getElementById('tab-content');
-    const filtered = issues.filter(i => i.status === currentFeedTab);
+    const filtered = currentFeedTab === 'all' ? issues : issues.filter(i => i.status === currentFeedTab);
     
     content.innerHTML = '';
     if (filtered.length === 0) {
-        content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No issues found in this category.</p>';
+        content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No issues found in this category.</p>';
     } else {
         const grid = document.createElement('div');
         grid.style.display = 'grid';
@@ -69,48 +70,24 @@ function updateTabsUI(issues) {
     }
 }
 
+window.changeTab = function(target) {
+    currentFeedTab = target;
+    updateTabsUI(cachedIssues);
+}
+
 async function renderIssues() {
-    const issueList = document.getElementById('issue-list');
-    issueList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Loading issues...</p>';
+    const content = document.getElementById('tab-content');
+    content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Loading issues feed...</p>';
     
     try {
         const response = await ApiClient.get('/issues/');
         const data = await response.json();
-        const issues = data.results || data;
+        cachedIssues = data.results || data;
         
-        issueList.innerHTML = '';
-        
-        if (issues.length === 0) {
-            issueList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No issues reported yet.</p>';
-            return;
-        }
-
-        issues.forEach(issue => {
-            const upvoteColor = issue.has_upvoted ? 'var(--brand-primary)' : 'var(--text-secondary)';
-            const card = document.createElement('div');
-            card.className = 'glass-panel';
-            card.style.padding = '25px';
-            
-            card.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <h3 style="margin-bottom: 5px;">${issue.title}</h3>
-                        <span style="font-size: 0.8em; color: var(--warning); border: 1px solid var(--border-glass); padding: 3px 8px; border-radius: 12px;">${issue.status.toUpperCase()}</span>
-                        <span style="font-size: 0.8em; color: var(--text-secondary); margin-left: 10px;">${issue.category} • Urgency: ${issue.urgency}/3</span>
-                        <p style="color: var(--text-secondary); margin-top: 15px; line-height: 1.5;">${issue.description}</p>
-                        <p style="font-size: 0.9em; margin-top: 15px; color: var(--text-primary);">📍 ${issue.location}</p>
-                    </div>
-                    <div style="text-align: center; cursor: pointer;" onclick="toggleUpvote(${issue.id})">
-                        <div style="font-size: 24px; color: ${upvoteColor};">⬆</div>
-                        <strong style="color: ${upvoteColor};">${issue.upvote_count}</strong>
-                    </div>
-                </div>
-            `;
-            issueList.appendChild(card);
-        });
+        updateTabsUI(cachedIssues);
     } catch (error) {
         console.error('Failed to parse issues:', error);
-        issueList.innerHTML = '<p style="text-align: center; color: var(--danger);">Error loading issues.</p>';
+        content.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 40px;">Error loading issues list.</p>';
     }
 }
 
