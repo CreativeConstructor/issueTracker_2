@@ -23,45 +23,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function renderCitizenDashboard(container) {
     container.innerHTML = `
-        <div style="margin-bottom: 40px; padding: 20px; border: 1px solid var(--border-glass); border-radius: 12px;">
-            <h3 style="margin-bottom: 15px;">Report New Public Issue</h3>
-            <form id="issue-form" style="display: grid; gap: 15px;">
-                <input class="form-input" id="i-title" placeholder="Issue Title" required>
-                <textarea class="form-input" id="i-desc" placeholder="Issue Description" required></textarea>
-                <div style="display: flex; gap: 15px;">
-                    <select class="form-input" id="i-cat" required>
-                        <option value="road">Road Breakage</option>
-                        <option value="water">Water Problem</option>
-                        <option value="electricity">Street Light / Electricity</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <select class="form-input" id="i-urg" required>
-                        <option value="1">Low Urgency</option>
-                        <option value="2">Medium Urgency</option>
-                        <option value="3">High Urgency</option>
-                    </select>
-                </div>
-                <input class="form-input" id="i-loc" placeholder="Specific Location" required>
-                <button type="submit" class="btn-primary">Submit Report</button>
-            </form>
+        <div style="margin-bottom: 40px; padding: 30px; border: 1px solid var(--border-glass); border-radius: 12px; text-align: center; background: rgba(255, 255, 255, 0.03);">
+            <h3 style="margin-bottom: 10px;">Have a Public Issue to Report?</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">Your reports help the government prioritize repairs and maintenance in your area.</p>
+            <a href="/report-issue/" class="btn-primary" style="display: inline-block; text-decoration: none; padding: 12px 30px;">Report New Public Issue</a>
         </div>
         <h3>My Reported Issues</h3>
         <div id="my-issues-list" style="margin-top: 20px; display: grid; gap: 15px;"></div>
     `;
-
-    document.getElementById('issue-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const data = {
-            title: document.getElementById('i-title').value,
-            description: document.getElementById('i-desc').value,
-            category: document.getElementById('i-cat').value,
-            urgency: parseInt(document.getElementById('i-urg').value),
-            location: document.getElementById('i-loc').value,
-        };
-        await ApiClient.post('/issues/', data);
-        alert("Issue successfully submitted!");
-        location.reload();
-    });
 
     const list = document.getElementById('my-issues-list');
     const res = await ApiClient.get('/issues/');

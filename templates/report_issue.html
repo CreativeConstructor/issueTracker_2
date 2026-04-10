@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 30px; max-width: 800px; margin: 40px auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2>Report New Public Issue</h2>
+        <a href="{% url 'dashboard' %}" class="btn-primary" style="text-decoration: none; background: var(--text-secondary); height: fit-content;">Back to Dashboard</a>
+    </div>
+
+    <form id="issue-form" style="display: grid; gap: 20px;">
+        <div>
+            <label for="i-title" style="display: block; margin-bottom: 8px; font-weight: 500;">Issue Title</label>
+            <input class="form-input" id="i-title" placeholder="e.g. Broken Pavement on Main St" required>
+        </div>
+
+        <div>
+            <label for="i-desc" style="display: block; margin-bottom: 8px; font-weight: 500;">Description</label>
+            <textarea class="form-input" id="i-desc" style="min-height: 120px;" placeholder="Provide as much detail as possible..." required></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <label for="i-cat" style="display: block; margin-bottom: 8px; font-weight: 500;">Category</label>
+                <select class="form-input" id="i-cat" required>
+                    <option value="road">Road Breakage</option>
+                    <option value="water">Water Problem</option>
+                    <option value="electricity">Street Light / Electricity</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="i-urg" style="display: block; margin-bottom: 8px; font-weight: 500;">Urgency Level</label>
+                <select class="form-input" id="i-urg" required>
+                    <option value="1">Low Urgency</option>
+                    <option value="2">Medium Urgency</option>
+                    <option value="3">High Urgency</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label for="i-loc" style="display: block; margin-bottom: 8px; font-weight: 500;">Specific Location</label>
+            <input class="form-input" id="i-loc" placeholder="Street name, landmark, or GPS coordinates" required>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top: 10px; height: 50px; font-size: 1.1em;">Submit Report</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/report_issue.js' %}"></script>
+{% endblock scripts %}
