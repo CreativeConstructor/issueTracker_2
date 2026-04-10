@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Public Issue Tracker{% endblock %}</title>
+    <meta name="description" content="Report public issues like road breakage, water problems and track local municipality responses.">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar glass-panel" style="padding: 15px 30px; margin-top: 20px;">
+            <a href="{% url 'index' %}" style="text-decoration: none;">
+                <h2 class="text-gradient">Public Issue Tracker</h2>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'index' %}">Feed</a>
+                <div id="auth-buttons">
+                    <a href="{% url 'login' %}">Sign In</a>
+                    <a href="{% url 'register' %}">Sign Up</a>
+                    <a href="{% url 'dashboard' %}" class="btn-primary" style="text-decoration: none;">Dashboard</a>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            {% block content %}
+            {% endblock content %}
+        </main>
+    </div>
+    
+    <!-- Core JS Integration -->
+    <script src="{% static 'js/api.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+    {% block scripts %}{% endblock scripts %}
+</body>
+</html>

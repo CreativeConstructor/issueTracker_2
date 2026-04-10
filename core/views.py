@@ -1,0 +1,13 @@
+from django.shortcuts import render
+
+def index_view(request):
+    return render(request, 'index.html')
+
+def login_view(request):
+    return render(request, 'login.html')
+
+def dashboard_view(request):
+    return render(request, 'dashboard.html')
+
+def report_issue_view(request):
+    return render(request, 'report_issue.html')
