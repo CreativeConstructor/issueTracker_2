@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; margin-top: 50px;">
+    <div class="glass-panel" style="padding: 40px; width: 100%; max-width: 450px;">
+        <h2 style="margin-bottom: 10px; text-align: center;">Government Portal</h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px;">Registration specifically for authorized officials.</p>
+        
+        <form id="register-form">
+            <input type="hidden" id="role" value="gov_employee">
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-primary);">Official Username</label>
+                <input type="text" id="username" class="form-input" placeholder="e.g. officer_name" required>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-primary);">Secure Password</label>
+                <input type="password" id="password" class="form-input" required>
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-primary);">Confirm Password</label>
+                <input type="password" id="password_confirm" class="form-input" required>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; height: 50px;">Complete Official Registration</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; color: var(--text-secondary);">
+            Regular citizen? <a href="{% url 'register' %}" style="color: var(--brand-primary); text-decoration: none;">Signup here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/register.js' %}"></script>
+{% endblock %}

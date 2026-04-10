@@ -26,3 +26,6 @@ def register_user(request):
 
 def register_view(request):
     return render(request, 'register.html')
+
+def register_gov_view(request):
+    return render(request, 'register_gov.html')

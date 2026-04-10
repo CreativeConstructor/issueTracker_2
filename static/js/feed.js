@@ -18,7 +18,10 @@ function createIssueCard(issue) {
     card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-                <h3 style="margin-bottom: 5px;">${issue.title}</h3>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <h3 style="margin: 0;">${issue.title}</h3>
+                    <span style="font-size: 0.75em; color: var(--warning); border: 1px solid var(--border-glass); padding: 2px 8px; border-radius: 10px; text-transform: uppercase;">${issue.status}</span>
+                </div>
                 <span style="font-size: 0.8em; color: var(--text-secondary);">${issue.category} • Urgency: ${issue.urgency}/3</span>
                 <p style="color: var(--text-secondary); margin-top: 15px; line-height: 1.5;">${issue.description}</p>
                 <p style="font-size: 0.9em; margin-top: 15px; color: var(--text-primary);">📍 ${issue.location}</p>
